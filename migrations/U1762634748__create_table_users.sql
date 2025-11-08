@@ -1,0 +1,1 @@
+CREATE TABLE IF NOT EXISTS "users" ( "created_at" timestamp, "id" serial PRIMARY KEY, "name" varchar )
