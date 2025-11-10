@@ -10,11 +10,13 @@
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                table: "users",
+                table: "payments",
                 columns: {
-                    id: "ID",
-                    name: "STRING",
-                    created_at: "DATETIME"
+                    id: "Id",
+                    name: "String",
+                    created_at: "DateTime",
+                    amount: "Number",
+                    is_paid: "Boolean"
                 }
             })
         }).then(res => res.json()).then(res => console.log(res));

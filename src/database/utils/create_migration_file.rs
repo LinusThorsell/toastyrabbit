@@ -8,12 +8,12 @@ pub fn build_create(spec: &structs::TableSpec) -> TableCreateStatement {
 
     for (name, kind) in &spec.columns {
         let mut col = ColumnDef::new(Alias::new(name));
-        match kind.as_str() {
-            "ID" => { col.integer().auto_increment().primary_key(); }
-            "NUMBER" => { col.integer(); }
-            "STRING" => { col.string(); }
-            "DATETIME" => { col.timestamp(); }
-            _ => { col.string(); }
+        match kind {
+            structs::ColumnKind::Id => { col.integer().auto_increment().primary_key(); }
+            structs::ColumnKind::Number => { col.integer(); }
+            structs::ColumnKind::String => { col.string(); }
+            structs::ColumnKind::DateTime => { col.timestamp(); }
+            structs::ColumnKind::Boolean => { col.boolean(); }
         };
         table.col(&mut col);
     }

@@ -1,0 +1,1 @@
+CREATE TABLE IF NOT EXISTS "payments" ( "amount" integer, "created_at" timestamp, "id" serial PRIMARY KEY, "is_paid" bool, "name" varchar )

@@ -6,8 +6,20 @@ use http::{Method, header};
 use tower_http::cors::{Any, CorsLayer};
 use tower_http::trace::TraceLayer;
 use tokio_postgres::NoTls;
+use sqlx::PgPool;
+use sqlx::postgres::PgPoolOptions;
+
+use std::collections::HashSet;
+use std::sync::{Arc, RwLock};
+
 
 mod database;
+
+#[derive(Clone)]
+pub struct AppState {
+    pub db: PgPool,
+    pub table_cache: Arc<RwLock<HashSet<String>>>,
+}
 
 #[tokio::main]
 async fn main() {
@@ -29,6 +41,17 @@ async fn main() {
         .await
         .expect("Failed to run migrations");
 
+    let pool = PgPoolOptions::new()
+        .max_connections(5)
+        .connect(db_url)
+        .await
+        .expect("failed to create sqlx pool");
+
+    let state = AppState {
+        db: pool,
+        table_cache: Arc::new(RwLock::new(HashSet::new())),
+    };
+
     let cors = CorsLayer::new()
         .allow_methods([Method::GET, Method::POST])
         .allow_headers([header::CONTENT_TYPE])
@@ -38,6 +61,9 @@ async fn main() {
         .route("/", get(|| async { "ok" }))
         .route("/health", get(|| async { "ok" }))
         .route("/database/table", post(database::post_table::create))
+        .route("/database/table", get(database::get_tables::get_tables))
+        .route("/collection/{table}", get(database::collections::get_collection))
+        .with_state(state)
         .layer(TraceLayer::new_for_http())
         .layer(cors);
 
