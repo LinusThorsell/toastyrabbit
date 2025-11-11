@@ -40,7 +40,7 @@ async fn fetch_table_as_json(
     state: &AppState,
     table: &str,
 ) -> Result<Json<Vec<Value>>, StatusCode> {
-    let query = format!(r#"SELECT * FROM "{}""#, table);
+    let query = format!(r#"SELECT to_jsonb(t) AS row FROM "{}" t"#, table);
 
     let rows_res = sqlx::query(&query).fetch_all(&state.db).await;
 
@@ -66,17 +66,8 @@ async fn fetch_table_as_json(
 
     let mut out = Vec::with_capacity(rows.len());
     for row in rows {
-        let mut obj = Map::new();
-        for col in row.columns() {
-            let name = col.name();
-            let val = row
-                .try_get::<String, _>(name)
-                .map(Value::String)
-                .or_else(|_| row.try_get::<i64, _>(name).map(|i| Value::Number(i.into())))
-                .unwrap_or(Value::Null);
-            obj.insert(name.to_string(), val);
-        }
-        out.push(Value::Object(obj));
+        let v: Value = row.try_get("row").unwrap_or(Value::Null);
+        out.push(v);
     }
 
     Ok(Json(out))
