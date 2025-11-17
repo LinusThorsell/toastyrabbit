@@ -1,7 +1,7 @@
 use serde::{Serialize, Deserialize};
 use std::collections::BTreeMap;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct TableSpec {
     pub table: String,
     pub columns: BTreeMap<String, ColumnKind>,
