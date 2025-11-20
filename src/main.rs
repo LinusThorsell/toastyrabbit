@@ -65,7 +65,11 @@ async fn main() {
         .route("/database/table", post(database::post_table::create))
         .route("/database/table", get(database::get_tables::get_tables))
         .route("/development/typedefs", get(development::get_typescript_types::get_typedefs))
-        .route("/collection/{table}", get(database::collections::get_collection))
+        // Collection routes - more specific routes first
+        .route("/collection/{table}/first", get(database::collections::get_first))
+        .route("/collection/{table}/page", get(database::collections::get_page))
+        .route("/collection/{table}/get", get(database::collections::get_by_id))
+        .route("/collection/{table}", get(database::collections::get_all))
         .with_state(state)
         .layer(TraceLayer::new_for_http())
         .layer(cors);

@@ -20,4 +20,6 @@ declare module "toastyrabbit/datatypes" {
     users: Users;
     payments: Payments;
   }
+
+  export type TT = ToastyTables;
 }

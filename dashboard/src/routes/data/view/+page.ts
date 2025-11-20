@@ -1,31 +1,35 @@
 import type { PageLoad } from "./$types";
-import { PUBLIC_API_URL } from "$env/static/public";
 
 import ToastyRabbit from "toastyrabbit";
-import { type ToastyTables } from "toastyrabbit/datatypes"
+import { type TableRow } from "toastyrabbit";
+import { type TT } from "toastyrabbit/datatypes"
 
-type TableDef = {
+type TableWithDataDef = {
     table: string;
     columns: Record<string, string>;
-    rows: Record<string, unknown>[];
+    rows: TableRow<TT>[];
 };
 
 export const load: PageLoad = async ({ fetch }) => {
-    const tr = new ToastyRabbit<ToastyTables>("http://localhost:3000/");
+    const tr = new ToastyRabbit<TT>("http://localhost:3000/");
 
-    const users = await tr.getAll("users");
+    tr.getFirst("users").then((rows) => {
+        console.log(rows);
+    });
 
-    const tablesRes = await fetch(`${PUBLIC_API_URL}/database/table`);
-    const baseTables = (await tablesRes.json()) as Array<
-        Omit<TableDef, "rows">
-    >;
+    tr.get("users", 2).then((rows) => {
+        console.log(rows);
+    });
 
-    const tables: TableDef[] = await Promise.all(
+    tr.getPage("users", 2, 3).then((rows) => {
+        console.log(rows[0]);
+    });
+
+    const baseTables = await tr.getTables();
+
+    const tables: TableWithDataDef[] = await Promise.all(
         baseTables.map(async (table) => {
-            const rowsRes = await fetch(
-                `${PUBLIC_API_URL}/collection/${table.table}`,
-            );
-            const rows = (await rowsRes.json()) as Record<string, unknown>[];
+            const rows = await tr.getAll(table.table);
             return {
                 ...table,
                 rows,

@@ -40,6 +40,8 @@ pub async fn get_typedefs(
     }
     output.push_str("  }\n");
 
+    output.push_str("\n  export type TT = ToastyTables;\n");
+
     output.push_str("}\n");
 
     Ok(output)
