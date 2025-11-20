@@ -14,6 +14,7 @@ use std::sync::{Arc, RwLock};
 
 
 mod database;
+mod development;
 
 #[derive(Clone)]
 pub struct AppState {
@@ -57,12 +58,18 @@ async fn main() {
         .allow_headers([header::CONTENT_TYPE])
         .allow_origin(Any);
 
+    // TODO: hide /development routes when not in dev.
     let app = Router::new()
         .route("/", get(|| async { "ok" }))
         .route("/health", get(|| async { "ok" }))
         .route("/database/table", post(database::post_table::create))
         .route("/database/table", get(database::get_tables::get_tables))
-        .route("/collection/{table}", get(database::collections::get_collection))
+        .route("/development/typedefs", get(development::get_typescript_types::get_typedefs))
+        // Collection routes - more specific routes first
+        .route("/collection/{table}/first", get(database::collections::get_first))
+        .route("/collection/{table}/page", get(database::collections::get_page))
+        .route("/collection/{table}/get", get(database::collections::get_by_id))
+        .route("/collection/{table}", get(database::collections::get_all))
         .with_state(state)
         .layer(TraceLayer::new_for_http())
         .layer(cors);

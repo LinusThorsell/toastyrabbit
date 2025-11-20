@@ -7,5 +7,9 @@ pkgs.mkShell {
   ];
 
   PKG_CONFIG_PATH = "${pkgs.openssl.dev}/lib/pkgconfig";
+
+  shellHook = ''
+    source /etc/set-environment
+  '';
 }
 
