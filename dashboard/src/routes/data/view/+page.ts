@@ -11,7 +11,7 @@ type TableWithDataDef = {
 };
 
 export const load: PageLoad = async ({ fetch }) => {
-    const tr = new ToastyRabbit<TT>("http://localhost:3000/");
+    const tr = new ToastyRabbit<TT>("http://localhost:3000/", fetch);
 
     tr.getFirst("users").then((rows) => {
         console.log(rows);

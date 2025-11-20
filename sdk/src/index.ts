@@ -9,22 +9,24 @@ export type TableInfo<M extends TableMapBase> = {
 
 export default class ToastyRabbit<M extends TableMapBase = TableMapBase> {
   url: string;
+  fetch_fn: typeof fetch;
 
-  constructor(url: string) {
+  constructor(url: string, fetch_fn?: typeof fetch) {
     if (!url.endsWith("/")) url += "/";
     if (url.endsWith("/")) url = url.slice(0, -1);
     this.url = url;
+    this.fetch_fn = fetch_fn || fetch;
   }
 
   async get<K extends keyof M & string>(table: K, id: number): Promise<M[K]> {
-    const res = await fetch(`${this.url}/collection/${table}/get?` + new URLSearchParams({
+    const res = await this.fetch_fn(`${this.url}/collection/${table}/get?` + new URLSearchParams({
       id: id.toString(),
     }));
     return await res.json();
   }
 
   async getPage<K extends keyof M & string>(table: K, page: number, per_page: number): Promise<M[K][]> {
-    const res = await fetch(`${this.url}/collection/${table}/page?` + new URLSearchParams({
+    const res = await this.fetch_fn(`${this.url}/collection/${table}/page?` + new URLSearchParams({
       page: page.toString(),
       per_page: per_page.toString(),
     }));
@@ -32,17 +34,17 @@ export default class ToastyRabbit<M extends TableMapBase = TableMapBase> {
   }
 
   async getFirst<K extends keyof M & string>(table: K): Promise<M[K]> {
-    const res = await fetch(`${this.url}/collection/${table}/first`);
+    const res = await this.fetch_fn(`${this.url}/collection/${table}/first`);
     return await res.json();
   }
 
   async getAll<K extends keyof M & string>(table: K): Promise<M[K][]> {
-    const res = await fetch(`${this.url}/collection/${table}`);
+    const res = await this.fetch_fn(`${this.url}/collection/${table}`);
     return await res.json();
   }
 
   async getTables(): Promise<TableInfo<M>[]> {
-    const res = await fetch(`${this.url}/database/table`);
+    const res = await this.fetch_fn(`${this.url}/database/table`);
     return await res.json();
   }
 }
