@@ -16,9 +16,17 @@ declare module "toastyrabbit/datatypes" {
     name: string;
   }
 
+  export interface SomeTableTest123 {
+    id: number;
+    some_column: string;
+    some_date: Date;
+    test_string: string;
+  }
+
   export interface ToastyTables {
     users: Users;
     payments: Payments;
+    some_table_test_123: SomeTableTest123;
   }
 
   export type TT = ToastyTables;

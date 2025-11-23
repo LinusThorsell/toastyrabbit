@@ -6,8 +6,29 @@
     import Separator from "$lib/components/ui/separator/separator.svelte";
     import * as Select from "$lib/components/ui/select/index.js";
 
-    const createTestTable = () => {
-        console.log("create test table");
+    const column_types = [
+        { name: "Id", value: "Id", disabled: true },
+        { name: "String", value: "String" },
+        { name: "Number", value: "Number" },
+        { name: "Boolean", value: "Boolean" },
+        { name: "DateTime", value: "DateTime" },
+    ];
+
+    let table_name = $state("");
+    let table_columns = $state([
+        {
+            name: "id",
+            type: "Id",
+            disabled: true,
+        },
+    ]);
+
+    const createTable = () => {
+        const columns: Record<string, string> = Object.fromEntries(
+            table_columns
+                .filter((c) => c.name.trim().length)
+                .map((c) => [c.name, c.type] as const),
+        );
 
         fetch("http://localhost:3000/database/table", {
             method: "POST",
@@ -15,32 +36,22 @@
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                table: "payments",
-                columns: {
-                    id: "Id",
-                    name: "String",
-                    created_at: "DateTime",
-                    amount: "Number",
-                    is_paid: "Boolean",
-                },
+                table: table_name,
+                columns: columns,
             }),
         })
             .then((res) => res.json())
             .then((res) => console.log(res));
     };
 
-    let table_name = $state("");
+    const addColumn = () => {
+        table_columns.push({ name: "", type: "String", disabled: false });
+    };
 </script>
 
-Manage data
-
-<Button onclick={createTestTable}>Create test table</Button>
-
-<Input bind:value={table_name} />
-
-<Sheet.Root open={true}>
+<Sheet.Root>
     <Sheet.Trigger>
-        <Button>Open</Button>
+        <Button>Create new table</Button>
     </Sheet.Trigger>
     <Sheet.Content>
         <Sheet.Header>
@@ -56,20 +67,41 @@ Manage data
 
             <Label class="mb-2">Columns</Label>
 
-            <div class="flex items-center gap-2">
-                <Input disabled={true} value="id" />
-                <Select.Root type="single" disabled={true}>
-                    <Select.Trigger class="w-[180px]">Primary key</Select.Trigger>
-                </Select.Root>
-            </div>
+            {#each table_columns as column}
+                <div class="flex items-center mb-2 gap-2">
+                    <Input
+                        disabled={column.disabled}
+                        bind:value={column.name}
+                    />
+                    <Select.Root
+                        type="single"
+                        disabled={column.disabled}
+                        bind:value={column.type}
+                    >
+                        <Select.Trigger class="w-[180px]"
+                            >{column.type}</Select.Trigger
+                        >
+                        <Select.Content>
+                            {#each column_types as column_type}
+                                <Select.Item
+                                    value={column_type.value}
+                                    disabled={column_type.disabled}
+                                >
+                                    {column_type.name}
+                                </Select.Item>
+                            {/each}
+                        </Select.Content>
+                    </Select.Root>
+                </div>
+            {/each}
 
-            <Button class="mt-4">Add column</Button>
+            <Button onclick={addColumn} class="mt-2">Add column</Button>
         </div>
 
         <Sheet.Close class="mt-auto mb-4">
             <Separator class="my-4" />
             <div class="flex justify-between gap-2 px-4">
-                <Button variant="default">Create</Button>
+                <Button onclick={createTable} variant="default">Create</Button>
                 <Button variant="secondary">Cancel</Button>
             </div>
         </Sheet.Close>
