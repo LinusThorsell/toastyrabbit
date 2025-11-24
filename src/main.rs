@@ -19,6 +19,7 @@ mod development;
 #[derive(Clone)]
 pub struct AppState {
     pub db: PgPool,
+    pub db_url: String,
     pub table_cache: Arc<RwLock<HashSet<String>>>,
 }
 
@@ -50,6 +51,7 @@ async fn main() {
 
     let state = AppState {
         db: pool,
+        db_url: db_url.to_string(),
         table_cache: Arc::new(RwLock::new(HashSet::new())),
     };
 
