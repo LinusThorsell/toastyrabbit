@@ -5,8 +5,12 @@
     import * as Sheet from "$lib/components/ui/sheet/index.js";
     import Separator from "$lib/components/ui/separator/separator.svelte";
     import * as Select from "$lib/components/ui/select/index.js";
+    import ToastyRabbit, { type ColumnTypes } from "toastyrabbit";
+    import { type TT } from "toastyrabbit/datatypes";
 
-    const column_types = [
+    const tr = new ToastyRabbit<TT>("http://localhost:3000/", fetch);
+
+    const column_types: { name: string; value: ColumnTypes; disabled?: boolean }[] = [
         { name: "Id", value: "Id", disabled: true },
         { name: "String", value: "String" },
         { name: "Number", value: "Number" },
@@ -15,7 +19,9 @@
     ];
 
     let table_name = $state("");
-    let table_columns = $state([
+    let table_columns = $state<
+        { name: string; type: ColumnTypes; disabled?: boolean }[]
+    >([
         {
             name: "id",
             type: "Id",
@@ -24,24 +30,13 @@
     ]);
 
     const createTable = () => {
-        const columns: Record<string, string> = Object.fromEntries(
+        const columns: Record<string, ColumnTypes> = Object.fromEntries(
             table_columns
                 .filter((c) => c.name.trim().length)
-                .map((c) => [c.name, c.type] as const),
+                .map((c) => [c.name, c.type]),
         );
 
-        fetch("http://localhost:3000/database/table", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                table: table_name,
-                columns: columns,
-            }),
-        })
-            .then((res) => res.json())
-            .then((res) => console.log(res));
+        tr.createTable(table_name, columns);
     };
 
     const addColumn = () => {

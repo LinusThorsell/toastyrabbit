@@ -1,0 +1,1 @@
+CREATE TABLE IF NOT EXISTS "weeeee" ( "id" serial PRIMARY KEY, "wwwwwww" varchar )
