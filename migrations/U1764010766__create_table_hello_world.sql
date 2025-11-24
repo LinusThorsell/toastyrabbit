@@ -1,0 +1,1 @@
+CREATE TABLE IF NOT EXISTS "hello_world" ( "id" serial PRIMARY KEY, "message" varchar, "timestamp" timestamp )

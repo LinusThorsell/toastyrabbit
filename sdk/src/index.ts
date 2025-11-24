@@ -6,6 +6,7 @@ export type TableInfo<M extends TableMapBase> = {
   table: TableName<M>;
   columns: Record<string, string>;
 };
+export type ColumnTypes = "Id" | "String" | "Number" | "Boolean" | "DateTime";
 
 export default class ToastyRabbit<M extends TableMapBase = TableMapBase> {
   url: string;
@@ -45,6 +46,20 @@ export default class ToastyRabbit<M extends TableMapBase = TableMapBase> {
 
   async getTables(): Promise<TableInfo<M>[]> {
     const res = await this.fetch_fn(`${this.url}/database/table`);
+    return await res.json();
+  }
+
+  async createTable(table_name: string, columns: Record<string, ColumnTypes>) {
+    const res = await this.fetch_fn(`${this.url}/database/table`, {
+      method: "POST",
+      headers: {
+          "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+          table: table_name,
+          columns: columns,
+      }),
+    });
     return await res.json();
   }
 }
