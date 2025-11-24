@@ -23,10 +23,30 @@ declare module "toastyrabbit/datatypes" {
     test_string: string;
   }
 
+  export interface Weeeee {
+    id: number;
+    wwwwwww: string;
+  }
+
+  export interface HelloWorld {
+    id: number;
+    message: string;
+    timestamp: Date;
+  }
+
+  export interface TestTableNew {
+    eeee: string;
+    id: number;
+    www: string;
+  }
+
   export interface ToastyTables {
     users: Users;
     payments: Payments;
     some_table_test_123: SomeTableTest123;
+    weeeee: Weeeee;
+    hello_world: HelloWorld;
+    test_table_new: TestTableNew;
   }
 
   export type TT = ToastyTables;

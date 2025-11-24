@@ -1,0 +1,1 @@
+CREATE TABLE IF NOT EXISTS "test_table_new" ( "eeee" varchar, "id" serial PRIMARY KEY, "www" varchar )
