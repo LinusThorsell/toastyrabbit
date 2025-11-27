@@ -1,0 +1,1 @@
+DROP TABLE "some_table_test_123"

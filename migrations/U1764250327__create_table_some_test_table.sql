@@ -1,0 +1,1 @@
+CREATE TABLE IF NOT EXISTS "some_test_table" ( "data" varchar, "id" serial PRIMARY KEY, "time" timestamp )

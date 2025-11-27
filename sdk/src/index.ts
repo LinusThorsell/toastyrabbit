@@ -60,6 +60,21 @@ export default class ToastyRabbit<M extends TableMapBase = TableMapBase> {
           columns: columns,
       }),
     });
-    return await res.json();
+
+    return res;
+  }
+
+  async deleteTable(table_name: string) {
+    const res = await this.fetch_fn(`${this.url}/database/table`, {
+      method: "DELETE",
+      headers: {
+          "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+          table: table_name,
+          columns: {},
+      }),
+    });
+    return res;
   }
 }

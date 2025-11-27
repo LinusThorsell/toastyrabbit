@@ -5,12 +5,21 @@
     import * as Sheet from "$lib/components/ui/sheet/index.js";
     import Separator from "$lib/components/ui/separator/separator.svelte";
     import * as Select from "$lib/components/ui/select/index.js";
-    import ToastyRabbit, { type ColumnTypes } from "toastyrabbit";
+    import * as Popover from "$lib/components/ui/popover/index.js";
+    import ToastyRabbit, {
+        type ColumnTypes,
+        type TableInfo,
+    } from "toastyrabbit";
     import { type TT } from "toastyrabbit/datatypes";
+    import { onMount } from "svelte";
 
     const tr = new ToastyRabbit<TT>("http://localhost:3000/", fetch);
 
-    const column_types: { name: string; value: ColumnTypes; disabled?: boolean }[] = [
+    const column_types: {
+        name: string;
+        value: ColumnTypes;
+        disabled?: boolean;
+    }[] = [
         { name: "Id", value: "Id", disabled: true },
         { name: "String", value: "String" },
         { name: "Number", value: "Number" },
@@ -37,11 +46,27 @@
         );
 
         tr.createTable(table_name, columns);
+        setTimeout(() => refreshTables(), 1000);
     };
 
     const addColumn = () => {
         table_columns.push({ name: "", type: "String", disabled: false });
     };
+
+    const deleteTable = (table: TableInfo<TT>) => {
+        tr.deleteTable(table.table);
+        setTimeout(() => refreshTables(), 1000);
+    };
+
+    let tables = $state<TableInfo<TT>[]>();
+
+    const refreshTables = async () => {
+        tables = await tr.getTables();
+    }
+
+    onMount(async () => {
+        await refreshTables();
+    });
 </script>
 
 <Sheet.Root>
@@ -102,3 +127,26 @@
         </Sheet.Close>
     </Sheet.Content>
 </Sheet.Root>
+
+{#each tables as table}
+    <div>
+        <Popover.Root>
+            <Popover.Trigger>
+                <Button>Delete table: {table.table}</Button>
+            </Popover.Trigger>
+            <Popover.Content>
+                Are you sure you want to delete the table: {table.table}?
+
+                <Popover.Close>
+                    <Button
+                        class="mb-2 mt-2"
+                        variant="destructive"
+                        onclick={() => deleteTable(table)}
+                        >Yes, Delete table and all data</Button
+                    >
+                    <Button>Cancel</Button>
+                </Popover.Close>
+            </Popover.Content>
+        </Popover.Root>
+    </div>
+{/each}

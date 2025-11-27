@@ -1,6 +1,5 @@
 use axum::{
-    Router,
-    routing::{get, post},
+    routing::{delete, get, post}, Router
 };
 use http::{Method, header};
 use tower_http::cors::{Any, CorsLayer};
@@ -56,7 +55,7 @@ async fn main() {
     };
 
     let cors = CorsLayer::new()
-        .allow_methods([Method::GET, Method::POST])
+        .allow_methods([Method::GET, Method::POST, Method::DELETE])
         .allow_headers([header::CONTENT_TYPE])
         .allow_origin(Any);
 
@@ -66,6 +65,7 @@ async fn main() {
         .route("/health", get(|| async { "ok" }))
         .route("/database/table", post(database::post_table::create))
         .route("/database/table", get(database::get_tables::get_tables))
+        .route("/database/table", delete(database::delete_tables::delete))
         .route("/development/typedefs", get(development::get_typescript_types::get_typedefs))
         // Collection routes - more specific routes first
         .route("/collection/{table}/first", get(database::collections::get_first))
